@@ -18,16 +18,14 @@ class Search extends CI_Controller {
 		$search=$this->input->post('search');
 		//$search="xxx";
 		// /echo date('Y');die();
-		$search="rahasia ahok sekarang";
-		$balik = array('messages' => array(),'isi'=> array(),'error'=> array());
+		//$search="rahasia ahok";
+		$balik = array('messages' => array(),'isi'=> array(),'error'=> array(),'twitter'=> array(),'issue'=> array());
 		$table=$this->M_search->table($search);
 		$kandidat=$this->M_search->kandidat($search);
-		print_r($table);die();
+		// /print_r($table);die();
 		$time=$this->M_search->time($search);
 		$bulan=$this->M_search->bulan($search);
 		$tgl=$this->tgl($search);
-		//echo $tgl;die();
-		//print_r($bulan->return);die();
 		if ($kandidat=="") {
 			$id_kandidat=null;
 		}
@@ -52,40 +50,45 @@ class Search extends CI_Controller {
 		else {
 			$tablenya=null;
 		}
-		//print_r($bulan->return);die();
-		if ($tablenya=="issue") {
-			$hasil=$this->M_search->cari($table->table_search,$id_kandidat,$the_time,$bulan,$tgl);
+		if ($kandidat!==""||$kandidat!==NULL) {
+			//echo "string";die();
+			$balik['messages'] = "oke";
+			$hasiltwitter=$this->M_search->cari_twitter("sumkandtonetgl",$id_kandidat,$the_time,$bulan,$tgl);
+			$hasilissue=$this->M_search->cari("issue",$id_kandidat,$the_time,$bulan,$tgl);
+			$no=1;
+			foreach ($hasilissue as $row => $value) {
+				$output[] = array(
+					"$no",
+					$value->issue,
+					$value->sub_issue,
+					$value->tone,
+					$value->jml
+				);
+				$no++;
+			}
+			if (!empty($hasilissue&&$hasiltwitter)) {
 
-			if (!empty($hasil)) {
-				$balik['messages'] = $table->table_search;
-
-				$no=1;
-
-				foreach ($hasil as $row => $value) {
-					$output[] = array(
-						"$no",
-						$value->nama,
-						$value->issue,
-						$value->sub_issue,
-						$value->tanggal,
-						$value->tone
-					);
-					$no++;
-				}
 				header('Access-Control-Allow-Origin: *');
 		    header("Content-Type: application/json");
-				$balik['isi']= $output;
+				$balik['issue']= $output;
+				$balik['twitter']= $hasiltwitter;
+				echo json_encode($balik);
+
+			}
+			elseif (!empty($hasilissue)) {
+				header('Access-Control-Allow-Origin: *');
+		    header("Content-Type: application/json");
+				$balik['issue']= $output;
+				$balik['twitter']= "kosong";
 				echo json_encode($balik);
 			}
-		}
-		else if ($tablenya=="sumkandtonetgl") {
-			$hasil=$this->M_search->cari($table->table_search,$id_kandidat,$the_time,$bulan,$tgl);
-			$balik['messages'] = $table->table_search;
-			header('Access-Control-Allow-Origin: *');
-			header("Content-Type: application/json");
-			$balik['isi']= $hasil;
-			//print_r($hasil);
-			echo json_encode($balik);
+			elseif (!empty($hasiltwitter)) {
+				header('Access-Control-Allow-Origin: *');
+		    header("Content-Type: application/json");
+				$balik['issue']= "kosong";
+				$balik['twitter']= $hasiltwitter;
+				echo json_encode($balik);
+			}
 		}
 		else {
 			$balik['messages'] = "error";
@@ -93,6 +96,8 @@ class Search extends CI_Controller {
 		}
 
 	}
+
+
 	public function tgl($search)
 	{
 		$isi=explode(" ",$search);

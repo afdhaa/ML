@@ -25,9 +25,11 @@ class M_search extends CI_Model {
 	public function cari($table,$id_kandidat,$the_time,$bln="",$tgl="")
 	{
 		//print_r($the_time);die();
-		if ($id_kandidat!=NULL||$id_kandidat!="") {
-			$this->db->where('id_kandidat',$id_kandidat);
-		}
+		//if ($id_kandidat!=NULL||$id_kandidat!="") {
+
+		//}
+		$this->db->select("*, count(*) as jml");
+		$this->db->where('id_kandidat',$id_kandidat);
 
 		if (($bln!=""||$bln!=NULL)&&($tgl!=""||$tgl!=NULL)) {
 			//$date=$this->db->query("select $the_time as tgl")->row();
@@ -52,15 +54,15 @@ class M_search extends CI_Model {
 			//print_r($date);die();
 			$this->db->where('tanggal',$date->tgl);
 		}
-
-		$this->db->order_by('id', 'DESC');
+		$this->db->group_by('issue', 'DESC');
+		$this->db->order_by('jml', 'DESC');
 		return $this->db->get($table)->result();
 	}
 	public function cari_twitter($table,$id_kandidat,$the_time,$bln="",$tgl="")
 	{
-		if ($id_kandidat!=NULL||$id_kandidat!="") {
+		//if ($id_kandidat!=NULL||$id_kandidat!="") {
 			$this->db->where('id_kandidat',$id_kandidat);
-		}
+		//}
 
 		if (($bln!=""||$bln!=NULL)&&($tgl!=""||$tgl!=NULL)) {
 			//$date=$this->db->query("select $the_time as tgl")->row();

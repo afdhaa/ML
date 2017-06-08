@@ -22,8 +22,8 @@
   </div>
 </body>
 
-<div class="container" id="twittersearch" hidden>
-  <div class="col-md-6">
+<div class="container" >
+  <div class="col-md-6" id="twittersearch"hidden>
     <div class="panel panel-default">
       <div class="panel-heading">
         <input type="text"  name="" value="Data Twitter" id="judultwitter" disabled>
@@ -33,9 +33,7 @@
       </div>
     </div>
   </div>
-</div>
-<div class="container" id="valuesearch" hidden>
-  <div class="col-md-12">
+  <div class="col-md-12" id="valuesearch" hidden>
     <div class="panel panel-default">
       <div class="panel-heading">
         <input type="text"  name="" id="judulnyah" value="Hasil" disabled>
@@ -45,17 +43,20 @@
           <table class="table table-bordered" class="display" id="table_issue">
             <thead>
               <th>NO</th>
-              <th>Kandidat</th>
               <th>Issue</th>
               <th>Sub Issue</th>
-              <th>Tanggal</th>
               <th>Tone</th>
+              <th>Jumlah</th>
             </thead>
           </table>
         </div>
       </div>
     </div>
   </div>
+
+</div>
+<div class="container" >
+
 </div>
 
 
@@ -73,14 +74,13 @@ var dataSet;
 function tampilissue(){
   tablenya=$('#table_issue').DataTable( {
     retrieve: true,
-    data: dataSet,
+    data: dataIssue,
     columns: [
         { title: "NO" },
-        { title: "Kandidat" },
         { title: "Issue" },
         { title: "Sub Issue" },
-        { title: "tanggal" },
-        { title: "Tone" }
+        { title: "Tone" },
+        { title: "Jumlah" }
     ]
   } );
 }
@@ -94,19 +94,14 @@ function cari(){
     dataType:"JSON",
     success:function(response){
 
-      console.log(response.messages);
-      if (response.messages=="issue") {
-        console.log(response);
-        document.getElementById('twittersearch').hidden = true;
+      console.log(response.issue);
+      if (response.issue!==""&&response.twitter!=="") {
+        //  console.log(response);
+        document.getElementById('twittersearch').hidden = false;
         document.getElementById('valuesearch').hidden = false;
         document.getElementById('judulnyah').value=response.messages;
-        dataSet=response.isi;
-        tampilissue();
-      }else if (response.messages=="sumkandtonetgl") {
-        document.getElementById('valuesearch').hidden = true;
-        document.getElementById('twittersearch').hidden = false;
-        //document.getElementById('judultwitter').value=response.isi[0].kandidat;
-        var jml=response.isi.length;
+        dataIssue=response.issue;
+        var jml=response.twitter.length;
         var positif=0;
         var negatif=0;
         var netral=0;
@@ -115,9 +110,9 @@ function cari(){
 
 
         for (var i = 0; i < jml; i++) {
-          positif+=+response.isi[i].positif;
-          negatif+=+response.isi[i].negatif;
-          netral+=+response.isi[i].netral;
+          positif+=+response.twitter[i].positif;
+          negatif+=+response.twitter[i].negatif;
+          netral+=+response.twitter[i].netral;
           total+=+positif+negatif+netral;
 
         }
@@ -154,7 +149,7 @@ function cari(){
             },
             series: [{
                 type: 'pie',
-                name: 'response.messages.kandidat',
+                name: '',
                 innerSize: '50%',
                 data: [
                     ['Positif',   +positif],
@@ -163,6 +158,12 @@ function cari(){
                 ]
             }]
         });
+        tampilissue();
+      }else if (response.messages=="sumkandtonetgl") {
+        document.getElementById('valuesearch').hidden = true;
+        document.getElementById('twittersearch').hidden = false;
+        //document.getElementById('judultwitter').value=response.isi[0].kandidat;
+
       }
       else if (response.messages=="error") {
         document.getElementById('valuesearch').hidden = true;

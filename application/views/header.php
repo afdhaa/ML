@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
@@ -10,5 +9,5 @@
     <script type="text/javascript" src="<?php echo base_url('assets/js/bootstrap.min.js') ?>"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
     <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>  
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
   </head>
